@@ -82,3 +82,17 @@ def thread_service_shutdown(signum, frame):
     print('Caught signal %d' % signum)
     raise ThreadServiceExit
 
+
+def generate_quintic_spline_coeffs(waypoints):
+    coeffs = np.empty([waypoints.shape[0] - 1, 6])
+    for j in range(waypoints.shape[0] - 1):
+        i = waypoints[j]
+        f = waypoints[j+1]
+        coeffs[j][0] = i[1]
+        coeffs[j][1] = i[2]
+        coeffs[j][2] = i[3] / 2
+        coeffs[j][3] = (20 * f[1] - 20 * i[1] - (8 * f[2] + 12 * i[2]) * (f[0] - i[0]) - (3 * i[3] - f[3]) * ((f[0] - i[0]) ** 2) ) / (2 * ((f[0] - i[0]) ** 3) )
+        coeffs[j][4] = (30 * i[1] - 30 * f[1] + (14 * f[2] + 16 * i[2]) * (f[0] - i[0]) + (3 * i[3] - 2 * f[3]) * ((f[0] - i[0]) ** 2) ) / (2 * ((f[0] - i[0]) ** 4) )
+        coeffs[j][5] = (12 * f[1] - 12 * i[1] - (6 * f[2] + 6 * i[2]) * (f[0] - i[0]) - (i[3] - f[3]) * ((f[0] - i[0]) ** 2) ) / (2 * ((f[0] - i[0]) ** 5) )
+
+    return coeffs

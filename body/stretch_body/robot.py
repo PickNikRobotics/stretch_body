@@ -46,7 +46,6 @@ class RobotDynamixelThread(threading.Thread):
             time.sleep(tsleep)
 
 
-
 class RobotThread(threading.Thread):
     """
     This thread runs at 25Hz.
@@ -147,7 +146,6 @@ class Robot(Device):
         self.rt=None
         self.dt=None
 
-
     # ###########  Device Methods #############
 
     def startup(self):
@@ -214,7 +212,6 @@ class Robot(Device):
                 print 'Shutting down',k
                 self.devices[k].stop()
 
-
     def get_status(self):
         """
         Thread safe and atomic read of current Robot status data
@@ -230,7 +227,6 @@ class Robot(Device):
         print 'Serial No',self.params['serial_no']
         print 'Batch', self.params['batch_name']
         self._pretty_print_dict('Status',s)
-
 
     def push_command(self):
         """
@@ -250,7 +246,7 @@ class Robot(Device):
             if self.pimu is not None:
                 self.pimu.trigger_motor_sync()
 
-# ##################Home and Stow #######################################
+    # ################## Home and Stow #######################################
 
     def is_calibrated(self):
         """
@@ -344,6 +340,49 @@ class Robot(Device):
         #Let user know it is done
         self.pimu.trigger_beep()
         self.push_command()
+
+    def follow_trajectory(self, lift_waypoints=None, arm_waypoints=None,
+                          head_pan_waypoints=None, head_tilt_waypoints=None,
+                          base_waypoints=None, is_base_translation=False, **kwargs):
+        """Coordinated multi-joint trajectory following. Quintic
+        spline trajectories built for each joint waypoint provided.
+        Waypoints defined as Nx4 numpy array, [N x [time, pos, vel, accel]].
+        Positions values capped by respective joint's limits.
+        Valid end effector joints parsed at runtime based on yaml
+        configuration. Base mutual exclusive on rotation/translation.
+
+        Attributes
+        ----------
+        lift_waypoints: np.array([N x [time, position, velocity, acceleration]])
+            waypoints for the lift joint
+        arm_waypoints: np.array([N x [time, position, velocity, acceleration]])
+            waypoints for the arm joint
+        head_pan_waypoints: np.array([N x [time, position, velocity, acceleration]])
+            waypoints for the head pan joint
+        head_tilt_waypoints: np.array([N x [time, position, velocity, acceleration]])
+            waypoints for the head tilt joint
+        base_waypoints: np.array([N x [time, position, velocity, acceleration]])
+            waypoints for the base translation or rotation joint, depending on bool
+        is_base_translation: bool
+            whether base waypoints refers to base translation or base rotation
+        *_waypoints: np.array([N x [time, position, velocity, acceleration]])
+            kwargs allow named args of pattern "<end_effector_joint>_waypoints" which
+            allows any end effector configuration defined in yaml to follow a traj
+
+        Returns
+        -------
+        bool
+            False if provided malformed waypoints, else True
+        """
+        if lift_waypoints:
+            if lift_waypoints.shape[0] < 2 or lift_waypoints.shape[1] != 4:
+                return False
+
+            coeffs = generate_quintic_spline_coeffs(lift_waypoints)
+            # TODO: send coeffs + time to uCs
+
+        # TODO: implement other joints
+
     # ################ Helpers #################################
 
     def _pretty_print_dict(self, t, d):
