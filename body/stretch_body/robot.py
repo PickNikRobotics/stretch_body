@@ -8,6 +8,7 @@ import os
 import importlib
 
 from stretch_body.device import Device
+from stretch_body.trajectory import JointTrajectory
 import stretch_body.base as base
 import stretch_body.arm as arm
 import stretch_body.lift as lift
@@ -145,6 +146,8 @@ class Robot(Device):
         self.devices={ 'pimu':self.pimu, 'base':self.base, 'lift':self.lift, 'arm': self.arm, 'head': self.head, 'wacc':self.wacc, 'end_of_arm':self.end_of_arm}
         self.rt=None
         self.dt=None
+
+        self.trajectory = JointTrajectory(self.devices)
 
     # ###########  Device Methods #############
 
