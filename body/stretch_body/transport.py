@@ -109,7 +109,7 @@ class Transport():
                 print('Transport Serial not present for:',self.usb)
             return
 
-        dbg_buf = bytes()
+        dbg_buf = ''
         try:
             ts = time.time()
             if dbg_on:

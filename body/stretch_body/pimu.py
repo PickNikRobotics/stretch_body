@@ -358,9 +358,9 @@ class Pimu(Device):
     def unpack_board_info(self,s):
         with self.lock:
             sidx=0
-            self.board_info['board_version'] = unpack_string_t(s[sidx:], 20).strip('\x00')
+            self.board_info['board_version'] = unpack_string_t(s[sidx:], 20).strip(b'\x00').decode()
             sidx += 20
-            self.board_info['firmware_version'] = unpack_string_t(s[sidx:], 20).strip('\x00')
+            self.board_info['firmware_version'] = unpack_string_t(s[sidx:], 20).strip(b'\x00').decode()
             sidx += 20
             return sidx
 
