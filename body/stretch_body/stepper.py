@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+from __future__ import print_function
 
 from stretch_body.transport import *
 from stretch_body.device import Device
@@ -564,7 +565,7 @@ class Stepper(Device):
             while self.transport.ser.inWaiting():
                 r=self.transport.ser.readline()
                 if do_print:
-                    print(r)
+                    print(r, end=' ')
                 reply.append(r)
             return reply
 
