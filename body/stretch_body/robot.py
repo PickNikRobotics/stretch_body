@@ -31,9 +31,9 @@ class RobotDynamixelThread(threading.Thread):
     def __init__(self,robot):
         threading.Thread.__init__(self)
         self.robot=robot
-        self.robot_update_rate_hz = 60.0  #Hz
+        self.robot_update_rate_hz = 100.0  #Hz
         self.trajectory_downrate_int = 1  # Step the trajectory manager at 60hz for smooth vel ctrl
-        self.status_downrate_int = 4  # Step the status at 15hz (most bus can handle)
+        self.status_downrate_int = 7  # Step the status at ~15hz (most bus can handle)
         self.timer_stats = hello_utils.TimerStats()
         self.shutdown_flag = threading.Event()
         self.first_status=False
@@ -500,8 +500,8 @@ class Robot(Device):
         if self.params['sync_mode_enabled']:
             self.pimu.trigger_motor_sync() #Start motion of non-dynamixel joints
 
-        self.head.get_joint('head_pan').start_trajectory(position_ctrl=False, threaded=False, watchdog_timeout=0)
-        self.head.get_joint('head_tilt').start_trajectory(position_ctrl=False, threaded=False, watchdog_timeout=0)
+        self.head.get_joint('head_pan').start_trajectory(position_ctrl=True, threaded=False, watchdog_timeout=0)
+        self.head.get_joint('head_tilt').start_trajectory(position_ctrl=True, threaded=False, watchdog_timeout=0)
         self.end_of_arm.motors['wrist_yaw'].start_trajectory(position_ctrl=True, threaded=False)
         time.sleep(0.1) #Give time for synced trajectories to start
 
