@@ -488,7 +488,8 @@ class Robot(Device):
         return self.arm.motor.status['trajectory_active'] or  self.lift.motor.status['trajectory_active'] \
                 or self.base.left_wheel.status['trajectory_active'] or self.base.right_wheel.status['trajectory_active'] \
                 or self.head.motors['head_pan'].status['trajectory_active'] or self.head.motors['head_tilt'].status['trajectory_active'] \
-                or self.end_of_arm.motors['wrist_yaw'].status['trajectory_active']
+                or self.end_of_arm.motors['wrist_yaw'].status['trajectory_active'] \
+                or (self.end_of_arm.is_tool_present('StretchGripper') and self.end_of_arm.motors['stretch_gripper'].status['trajectory_active'])
 
     def start_trajectory(self):
         """Coordinated multi-joint trajectory following.
@@ -503,6 +504,8 @@ class Robot(Device):
         self.head.get_joint('head_pan').start_trajectory(position_ctrl=True, threaded=False, watchdog_timeout=0)
         self.head.get_joint('head_tilt').start_trajectory(position_ctrl=True, threaded=False, watchdog_timeout=0)
         self.end_of_arm.motors['wrist_yaw'].start_trajectory(position_ctrl=True, threaded=False)
+        if self.end_of_arm.is_tool_present('StretchGripper'):
+            self.end_of_arm.motors['stretch_gripper'].start_trajectory(position_ctrl=True, threaded=False)
         time.sleep(0.1) #Give time for synced trajectories to start
 
     def stop_trajectory(self):
@@ -514,3 +517,5 @@ class Robot(Device):
         self.head.get_joint('head_pan').stop_trajectory()
         self.head.get_joint('head_tilt').stop_trajectory()
         self.end_of_arm.motors['wrist_yaw'].stop_trajectory()
+        if self.end_of_arm.is_tool_present('StretchGripper'):
+            self.end_of_arm.motors['stretch_gripper'].stop_trajectory()
