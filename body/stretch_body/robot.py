@@ -482,6 +482,9 @@ class Robot(Device):
         if self.end_of_arm.motors['wrist_yaw'].status['trajectory_active']:
             self.end_of_arm.motors['wrist_yaw'].push_trajectory()
 
+        if self.end_of_arm.is_tool_present('StretchGripper') and self.end_of_arm.motors['stretch_gripper'].status['trajectory_active']:
+            self.end_of_arm.motors['stretch_gripper'].push_trajectory()
+
     def is_trajectory_executing(self):
         # Executing is defined as the joint controller is tracking the trajectory
         # Returns false after the last segment has finished executing on the joint controller
